@@ -12,6 +12,7 @@ import (
 type I18nLanguage int
 
 const (
+	I18nLanguageNil I18nLanguage = 0 // 无关语言的默认
 	I18nLanguageEnUs I18nLanguage = 1
 	I18nLanguageZhCn I18nLanguage = 2
 	I18nLanguageJaJp I18nLanguage = 3
@@ -44,6 +45,10 @@ func (f *Faker) Choice(itemList interface{}) interface{} {
 
 	if ref.Kind() != reflect.Slice {
 		panic("itemList is not slice")
+	}
+
+	if ref.Len() == 0 {
+		return itemList
 	}
 
 	return ref.Index(f.Generator.Intn(ref.Len())).Interface()
@@ -258,4 +263,10 @@ func New() *Faker {
 		Generator: rand.New(rand.NewSource(time.Now().UnixNano())),
 		Language:  I18nLanguageEnUs,
 	}
+}
+
+func (f *Faker) Person() *Person {
+	p := NewPerson()
+	p.SetFaker(f)
+	return p
 }
