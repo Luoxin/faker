@@ -1,21 +1,22 @@
 package faker
 
 import (
+	"bytes"
 	"math"
 	"math/rand"
 	"reflect"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 )
 
 type I18nLanguage int
 
-const (
-	I18nLanguageNil I18nLanguage = 0 // 无关语言的默认
+var (
+	I18nLanguageNil  I18nLanguage = 0 // 无关语言的默认
 	I18nLanguageEnUs I18nLanguage = 1
 	I18nLanguageZhCn I18nLanguage = 2
-	I18nLanguageJaJp I18nLanguage = 3
 )
 
 // 字符串集合
@@ -36,10 +37,12 @@ func init() {
 }
 
 type Faker struct {
-	Generator *rand.Rand
-	Language  I18nLanguage
+	Generator   *rand.Rand
+	Language    I18nLanguage
+	ProviderMap map[I18nLanguage]*Provider
 }
 
+// 基础的随机选择
 func (f *Faker) Choice(itemList interface{}) interface{} {
 	ref := reflect.ValueOf(itemList)
 
@@ -246,6 +249,7 @@ func (f *Faker) Bool() bool {
 	return f.IntBetween(0, 100) > 50
 }
 
+// 创建新的
 func (f *Faker) InitGenerator() {
 	f.SetSeed(time.Now().UnixNano())
 }
@@ -259,14 +263,26 @@ func (f *Faker) SetLanguage(i18n I18nLanguage) {
 }
 
 func New() *Faker {
-	return &Faker{
+	f := &Faker{
 		Generator: rand.New(rand.NewSource(time.Now().UnixNano())),
 		Language:  I18nLanguageEnUs,
 	}
+	f.InitProviderMap()
+	return f
 }
 
-func (f *Faker) Person() *Person {
-	p := NewPerson()
-	p.SetFaker(f)
-	return p
+// 格式化数据
+func (f *Faker) Format(fmt string, args map[string]interface{}) string {
+	var msg bytes.Buffer
+
+	tmpl, err := template.New("").Parse(fmt)
+	if err != nil {
+		return fmt
+	}
+	err = tmpl.Execute(&msg, args)
+	if err != nil {
+		return fmt
+	}
+
+	return msg.String()
 }
