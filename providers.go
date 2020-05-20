@@ -17,7 +17,8 @@ type AddressProvider struct {
 }
 
 type InternetProvider struct {
-	FreeEmailDomains, Tlds []string
+	FreeEmailDomains, Tlds, UserNameFormatTemplates []string
+	EmailFormatTemplate                             string
 }
 
 type PhoneNumberProvider struct {
@@ -42,6 +43,11 @@ func (f *Faker) InitProviderMap() {
 			Internet: &InternetProvider{
 				FreeEmailDomains: []string{"gmail.com", "yahoo.com", "hotmail.com"},
 				Tlds:             []string{"com", "com", "com", "com", "com", "com", "biz", "info", "net", "org"},
+				UserNameFormatTemplates: []string{
+					"{{.LastName}}{{.FirstName}}", "{{.FirstName}}{{.LastName}}",
+					"{{.FirstName}}##", "?{{.LastName}}",
+				},
+				EmailFormatTemplate: "{{.UserName}}@{{.EmailDomain}}",
 			},
 			Person: &PersonProvider{
 				NameFormatTemplate: "{{.FirstName}}{{.LastName}}",
@@ -1233,7 +1239,18 @@ func (f *Faker) InitProviderMap() {
 				},
 			},
 			Internet: &InternetProvider{
-				FreeEmailDomains: nil,
+				FreeEmailDomains: []string{
+					"gmail.com",
+					"yahoo.com",
+					"hotmail.com",
+					"yahoo.com.au",
+					"hotmail.com.au",
+				},
+				UserNameFormatTemplates: []string{
+					"{{.LastName}}{{.FirstName}}", "{{.FirstName}}{{.LastName}}",
+					"{{.FirstName}}##", "?{{.LastName}}",
+				},
+				EmailFormatTemplate: "{{.UserName}}@{{.EmailDomain}}",
 			},
 		},
 		I18nLanguageZhCn: {
@@ -1289,6 +1306,18 @@ func (f *Faker) InitProviderMap() {
 				},
 				PhoneFormatTemplate: "{{.PhonePrefix}}########",
 			},
+			Internet: &InternetProvider{
+				FreeEmailDomains: []string{
+					"qq.com", "126.com", "163.com", "ymail.com", "aliyun.com", "126.net",
+					"163.net", "vip.163.com", "sohu.com", "vip.sina.com.cn", "outlook.com",
+					"qq.com  ", "vip.qq.com", "foxmail.com", "vip.sina.com", "sina.com.cn",
+				},
+				UserNameFormatTemplates: []string{
+					"{{.LastName}}{{.FirstName}}", "{{.FirstName}}{{.LastName}}",
+					"{{.FirstName}}##", "?{{.LastName}}",
+				},
+				EmailFormatTemplate: "{{.UserName}}@{{.EmailDomain}}",
+			},
 		},
 	}
 
@@ -1330,7 +1359,11 @@ func (f *Faker) GetProviderWithI18nLanguage(language I18nLanguage) (p *Provider)
 }
 
 func (f *Faker) GetProviderWithCheck(check func(p *Provider) bool) *Provider {
-	provider := f.GetProvider()
+	return f.GetProviderWithCheckI18nLanguage(f.Language, check)
+}
+
+func (f *Faker) GetProviderWithCheckI18nLanguage(language I18nLanguage, check func(p *Provider) bool) *Provider {
+	provider := f.GetProviderWithI18nLanguage(language)
 	if check(provider) {
 		provider = f.GetProviderWithI18nLanguage(I18nLanguageEnUs)
 		if check(provider) {

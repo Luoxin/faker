@@ -1,10 +1,15 @@
 package faker
 
 func (f *Faker) PersonFirstName() (firstName string) {
+	return f.PersonFirstNameWithI18nLanguage(f.Language)
+}
+
+func (f *Faker) PersonFirstNameWithI18nLanguage(language I18nLanguage) (firstName string) {
 	check := func(provider *Provider) bool {
 		return provider.Person == nil || len(provider.Person.FirstNames) == 0
 	}
-	p := f.GetProviderWithCheck(check)
+
+	p := f.GetProviderWithCheckI18nLanguage(language, check)
 	if check(p) {
 		return
 	}
@@ -38,10 +43,14 @@ func (f *Faker) PersonFirstNameFemale() (lastName string) {
 }
 
 func (f *Faker) PersonLastName() (lastName string) {
+	return f.PersonLastNameWithI18nLanguage(f.Language)
+}
+
+func (f *Faker) PersonLastNameWithI18nLanguage(language I18nLanguage) (lastName string) {
 	check := func(provider *Provider) bool {
 		return provider.Person == nil || len(provider.Person.LastNames) == 0
 	}
-	p := f.GetProviderWithCheck(check)
+	p := f.GetProviderWithCheckI18nLanguage(language, check)
 	if check(p) {
 		return
 	}
@@ -49,10 +58,16 @@ func (f *Faker) PersonLastName() (lastName string) {
 }
 
 func (f *Faker) PersonName() (name string) {
+	return f.PersonNameWithI18nLanguage(f.Language)
+}
+
+func (f *Faker) PersonNameWithI18nLanguage(language I18nLanguage) (name string) {
 	check := func(provider *Provider) bool {
-		return provider.Person == nil || len(provider.Person.FirstNames) == 0 || len(provider.Person.LastNames) == 0
+		return provider.Person == nil || len(provider.Person.LastNames) == 0
 	}
-	p := f.GetProviderWithCheck(check)
+
+	p := f.GetProviderWithCheckI18nLanguage(language, check)
+
 	if check(p) {
 		return
 	}
