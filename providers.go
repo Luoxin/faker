@@ -1,5 +1,9 @@
 package faker
 
+import (
+	"reflect"
+)
+
 type PersonProvider struct {
 	FirstNamesFemale,
 	FirstNamesMale,
@@ -38,6 +42,26 @@ type Provider struct {
 var providerMap map[I18nLanguage]*Provider
 
 func (f *Faker) InitProviderMap() {
+	var updateDate func(data interface{}) interface{}
+
+	updateDate = func(data interface{}) interface{} {
+		v := reflect.ValueOf(data)
+		switch v.Kind() {
+		case reflect.Slice:
+			data = UniqueSlice(data)
+		case reflect.Struct:
+			for idx := 0; idx < v.Len(); idx++ {
+				v.Field(idx).Set(reflect.ValueOf(v.Field(idx).Interface()))
+			}
+		case reflect.Map:
+			newMap := reflect.MakeMap(reflect.MapOf(v.Type().Key(), v.Type().Elem()))
+			for _, key := range v.MapKeys() {
+				newMap.SetMapIndex(key, reflect.ValueOf(updateDate(v.MapIndex(key).Interface())))
+			}
+		}
+		return data
+	}
+
 	providerMap = map[I18nLanguage]*Provider{
 		I18nLanguageNil: {
 			Internet: &InternetProvider{
@@ -1323,12 +1347,13 @@ func (f *Faker) InitProviderMap() {
 
 	for language, provider := range providerMap {
 		provider.Language = language
-
 		if provider.Person != nil {
 			person := provider.Person
 			person.FirstNames = append(person.FirstNamesFemale, person.FirstNamesMale...)
 		}
 	}
+
+	providerMap = updateDate(providerMap).(map[I18nLanguage]*Provider)
 }
 
 func (f *Faker) GetProvider() (p *Provider) {

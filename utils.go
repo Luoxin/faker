@@ -42,9 +42,9 @@ func MakeReflectNew(ref reflect.Value) interface{} {
 	case reflect.Float32, reflect.Float64:
 		return 0.0
 	case reflect.Map:
-		return reflect.MakeMap(ref.Type())
+		return reflect.MakeMap(reflect.MapOf(ref.Type().Key(), ref.Type().Elem()))
 	case reflect.Slice:
-		return reflect.MakeSlice(ref.Type(), 0, 0)
+		return reflect.MakeSlice(reflect.SliceOf(ref.Type()), 0, ref.Len())
 	case reflect.Chan:
 		return reflect.MakeChan(ref.Type(), 0)
 	case reflect.Func:
