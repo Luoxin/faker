@@ -1,39 +1,109 @@
 package faker
 
-type Person struct {
-	f *Faker
+func (f *Faker) PersonFirstName() (firstName string) {
+	check := func(provider *Provider) bool {
+		return provider.Person == nil || len(provider.Person.FirstNames) == 0
+	}
+	p := f.GetProviderWithCheck(check)
+	if check(p) {
+		return
+	}
+
+	return f.RandomStringElement(p.Person.FirstNames)
 }
 
-func NewPerson() *Person {
-	return &Person{}
+func (f *Faker) PersonFirstNameMale() (firstName string) {
+	check := func(provider *Provider) bool {
+		return provider.Person == nil || len(provider.Person.FirstNamesMale) == 0
+	}
+	p := f.GetProviderWithCheck(check)
+	if check(p) {
+		return
+	}
+	return f.RandomStringElement(p.Person.FirstNames)
 }
 
-func NewPersonWithFaker(f *Faker) *Person {
-	p := NewPerson()
-	p.SetFaker(f)
-	return p
+func (f *Faker) PersonFirstNameFemale() (lastName string) {
+	check := func(provider *Provider) bool {
+		return provider.Person == nil || len(provider.Person.FirstNamesFemale) == 0
+	}
+
+	p := f.GetProviderWithCheck(check)
+
+	if check(p) {
+		return
+	}
+
+	return f.RandomStringElement(p.Person.FirstNames)
 }
 
-func (p *Person) SetFaker(f *Faker) {
-	p.f = f
+func (f *Faker) PersonLastName() (lastName string) {
+	check := func(provider *Provider) bool {
+		return provider.Person == nil || len(provider.Person.LastNames) == 0
+	}
+	p := f.GetProviderWithCheck(check)
+	if check(p) {
+		return
+	}
+	return f.RandomStringElement(p.Person.LastNames)
 }
 
-func (p Person) FirstNameMale() string {
-	index := p.f.IntBetween(0, len(firstNameMale)-1)
-	return firstNameMale[index]
+func (f *Faker) PersonName() (name string) {
+	check := func(provider *Provider) bool {
+		return provider.Person == nil || len(provider.Person.FirstNames) == 0 || len(provider.Person.LastNames) == 0
+	}
+	p := f.GetProviderWithCheck(check)
+	if check(p) {
+		return
+	}
+
+	nameFormatTemplate := p.Person.NameFormatTemplate
+	if nameFormatTemplate == "" {
+		nameFormatTemplate = "{{FirstName}}{{LastName}}"
+	}
+
+	return f.Format(nameFormatTemplate, map[string]interface{}{
+		"FirstName": f.RandomStringElement(p.Person.FirstNames),
+		"LastName":  f.RandomStringElement(p.Person.LastNames),
+	})
 }
 
-func (p Person) FirstNameFemale() string {
-	index := p.f.IntBetween(0, len(firstNameFemale)-1)
-	return firstNameFemale[index]
+func (f *Faker) PersonNameMale() (name string) {
+	check := func(provider *Provider) bool {
+		return provider.Person == nil || len(provider.Person.FirstNamesMale) == 0 || len(provider.Person.LastNames) == 0
+	}
+	p := f.GetProviderWithCheck(check)
+	if check(p) {
+		return
+	}
+
+	nameFormatTemplate := p.Person.NameFormatTemplate
+	if nameFormatTemplate == "" {
+		nameFormatTemplate = "{{FirstName}}{{LastName}}"
+	}
+
+	return f.Format(nameFormatTemplate, map[string]interface{}{
+		"FirstName": f.RandomStringElement(p.Person.FirstNamesMale),
+		"LastName":  f.RandomStringElement(p.Person.LastNames),
+	})
 }
 
-func (p Person) FirstName() string {
-	names := append(firstNameMale, firstNameFemale...)
-	return p.Faker.RandomStringElement(names)
-}
+func (f *Faker) PersonNameFemale() (name string) {
+	check := func(provider *Provider) bool {
+		return provider.Person == nil || len(provider.Person.FirstNamesFemale) == 0 || len(provider.Person.LastNames) == 0
+	}
+	p := f.GetProviderWithCheck(check)
+	if check(p) {
+		return
+	}
 
-func (p Person) LastName() string {
-	index := p.f.IntBetween(0, len(lastName)-1)
-	return lastName[index]
+	nameFormatTemplate := p.Person.NameFormatTemplate
+	if nameFormatTemplate == "" {
+		nameFormatTemplate = "{{FirstName}}{{LastName}}"
+	}
+
+	return f.Format(nameFormatTemplate, map[string]interface{}{
+		"FirstName": f.RandomStringElement(p.Person.FirstNamesFemale),
+		"LastName":  f.RandomStringElement(p.Person.LastNames),
+	})
 }

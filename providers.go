@@ -9,6 +9,7 @@ type PersonProvider struct {
 	PrefixesMale,
 	SuffixesFemale,
 	SuffixesMale []string
+	NameFormatTemplate string
 }
 
 type AddressProvider struct {
@@ -23,16 +24,20 @@ type Provider struct {
 	Person   *PersonProvider
 	Address  *AddressProvider
 	Internet *InternetProvider
+	Language I18nLanguage
 }
 
 var providerMap map[I18nLanguage]*Provider
 
-func init() {
+func (f *Faker) InitProviderMap() {
 	providerMap = map[I18nLanguage]*Provider{
 		I18nLanguageNil: {
 			Internet: &InternetProvider{
 				FreeEmailDomains: []string{"gmail.com", "yahoo.com", "hotmail.com"},
 				Tlds:             []string{"com", "com", "com", "com", "com", "com", "biz", "info", "net", "org"},
+			},
+			Person: &PersonProvider{
+				NameFormatTemplate: "{{.FirstName}}{{.LastName}}",
 			},
 		},
 		I18nLanguageEnUs: {
@@ -1160,10 +1165,11 @@ func init() {
 					"Wuckert", "Wunsch", "Wyman", "Yost", "Yundt", "Zboncak", "Zemlak",
 					"Ziemann", "Zieme", "Zulauf",
 				},
-				PrefixesFemale: []string{"Mrs.", "Ms.", "Miss", "Dr."},
-				PrefixesMale:   []string{"Mr.", "Dr."},
-				SuffixesFemale: []string{"MD", "DDS", "PhD", "DVM"},
-				SuffixesMale:   []string{"Jr.", "Sr.", "I", "II", "III", "IV", "V", "MD", "DDS", "PhD", "DVM"},
+				PrefixesFemale:     []string{"Mrs.", "Ms.", "Miss", "Dr."},
+				PrefixesMale:       []string{"Mr.", "Dr."},
+				SuffixesFemale:     []string{"MD", "DDS", "PhD", "DVM"},
+				SuffixesMale:       []string{"Jr.", "Sr.", "I", "II", "III", "IV", "V", "MD", "DDS", "PhD", "DVM"},
+				NameFormatTemplate: "{{.FirstName}} {{.LastName}}",
 			},
 			Address: &AddressProvider{
 				Countries: []string{
@@ -1263,15 +1269,56 @@ func init() {
 					"湛", "宾", "戎", "勾", "茅", "利", "于", "呼", "居", "揭", "干", "但", "尉", "冶", "斯", "元",
 					"束", "檀", "衣", "信", "展", "阴", "昝", "智", "幸", "奉", "植", "衡", "富", "尧", "闭", "由",
 				},
+				NameFormatTemplate: "{{.LastName}}{{.FirstName}}",
 			},
 		},
 	}
 
-	for _, provider := range providerMap {
+	for language, provider := range providerMap {
+		provider.Language = language
+
 		if provider.Person != nil {
 			person := provider.Person
 			person.FirstNames = append(person.FirstNamesFemale, person.FirstNamesMale...)
 		}
 	}
+}
 
+func (f *Faker) GetProvider() (p *Provider) {
+	return f.GetProviderWithI18nLanguage(f.Language)
+}
+
+func (f *Faker) GetProviderWithI18nLanguage(language I18nLanguage) (p *Provider) {
+	switch language {
+	case I18nLanguageZhCn:
+		if _, ok := providerMap[I18nLanguageZhCn]; ok {
+			p = providerMap[I18nLanguageZhCn]
+			return
+		}
+		fallthrough
+	case I18nLanguageEnUs:
+		if _, ok := providerMap[I18nLanguageEnUs]; ok {
+			p = providerMap[I18nLanguageEnUs]
+			return
+		}
+		fallthrough
+	default:
+		if _, ok := providerMap[I18nLanguageNil]; ok {
+			p = providerMap[I18nLanguageNil]
+			return
+		}
+	}
+	return &Provider{}
+}
+
+func (f *Faker) GetProviderWithCheck(check func(p *Provider) bool) *Provider {
+	provider := f.GetProvider()
+	if check(provider) {
+		provider = f.GetProviderWithI18nLanguage(I18nLanguageEnUs)
+		if check(provider) {
+			provider = f.GetProviderWithI18nLanguage(I18nLanguageNil)
+		}
+	}
+
+	return provider
 }
