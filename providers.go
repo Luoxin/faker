@@ -20,10 +20,17 @@ type InternetProvider struct {
 	FreeEmailDomains, Tlds []string
 }
 
+type PhoneNumberProvider struct {
+	PhonePrefixes       []string
+	PhoneFormatTemplate string
+}
+
 type Provider struct {
-	Person   *PersonProvider
-	Address  *AddressProvider
-	Internet *InternetProvider
+	Person      *PersonProvider
+	Address     *AddressProvider
+	Internet    *InternetProvider
+	PhoneNumber *PhoneNumberProvider
+
 	Language I18nLanguage
 }
 
@@ -38,6 +45,9 @@ func (f *Faker) InitProviderMap() {
 			},
 			Person: &PersonProvider{
 				NameFormatTemplate: "{{.FirstName}}{{.LastName}}",
+			},
+			PhoneNumber: &PhoneNumberProvider{
+				PhoneFormatTemplate: "###-###-###",
 			},
 		},
 		I18nLanguageEnUs: {
@@ -1270,6 +1280,14 @@ func (f *Faker) InitProviderMap() {
 					"束", "檀", "衣", "信", "展", "阴", "昝", "智", "幸", "奉", "植", "衡", "富", "尧", "闭", "由",
 				},
 				NameFormatTemplate: "{{.LastName}}{{.FirstName}}",
+			},
+			PhoneNumber: &PhoneNumberProvider{
+				PhonePrefixes: []string{
+					"134", "135", "136", "137", "138", "139", "147", "150,", "151", "152",
+					"157", "158", "159", "182", "187", "188,", "130", "131", "132", "145",
+					"155", "156", "185", "186,", "145", "133", "153", "180", "181", "189",
+				},
+				PhoneFormatTemplate: "{{.PhonePrefix}}########",
 			},
 		},
 	}

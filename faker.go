@@ -51,7 +51,8 @@ func (f *Faker) Choice(itemList interface{}) interface{} {
 	}
 
 	if ref.Len() == 0 {
-		return itemList
+		ref = reflect.MakeSlice(ref.Type(), 1, 1)
+		return ref.Index(0).Interface()
 	}
 
 	return ref.Index(f.Generator.Intn(ref.Len())).Interface()
@@ -203,6 +204,51 @@ func (f *Faker) ShuffleString(s string) string {
 	return strings.Join(dest, "")
 }
 
+func (f *Faker) Bool() bool {
+	return f.IntBetween(0, 100) > 50
+}
+
+// 创建新的
+func (f *Faker) InitGenerator() {
+	f.SetSeed(time.Now().UnixNano())
+}
+
+func (f *Faker) SetSeed(seed int64) {
+	f.Generator = rand.New(rand.NewSource(seed))
+}
+
+func (f *Faker) SetLanguage(i18n I18nLanguage) {
+	f.Language = i18n
+}
+
+func New() *Faker {
+	f := &Faker{
+		Generator: rand.New(rand.NewSource(time.Now().UnixNano())),
+		Language:  I18nLanguageEnUs,
+	}
+	f.InitProviderMap()
+	return f
+}
+
+// 格式化数据
+func (f *Faker) Format(fmt string, args map[string]interface{}) (out string) {
+	var msg bytes.Buffer
+
+	tmpl, err := template.New("").Parse(fmt)
+	if err != nil {
+		return fmt
+	}
+	err = tmpl.Execute(&msg, args)
+	if err != nil {
+		return fmt
+	}
+
+	out = msg.String()
+	out = f.Bothify(out)
+	out = f.Asciify(out)
+	return out
+}
+
 func (f *Faker) Numerify(in string) (out string) {
 	for _, c := range strings.Split(in, "") {
 		if c == "#" {
@@ -243,46 +289,4 @@ func (f *Faker) Asciify(in string) (out string) {
 	}
 
 	return
-}
-
-func (f *Faker) Bool() bool {
-	return f.IntBetween(0, 100) > 50
-}
-
-// 创建新的
-func (f *Faker) InitGenerator() {
-	f.SetSeed(time.Now().UnixNano())
-}
-
-func (f *Faker) SetSeed(seed int64) {
-	f.Generator = rand.New(rand.NewSource(seed))
-}
-
-func (f *Faker) SetLanguage(i18n I18nLanguage) {
-	f.Language = i18n
-}
-
-func New() *Faker {
-	f := &Faker{
-		Generator: rand.New(rand.NewSource(time.Now().UnixNano())),
-		Language:  I18nLanguageEnUs,
-	}
-	f.InitProviderMap()
-	return f
-}
-
-// 格式化数据
-func (f *Faker) Format(fmt string, args map[string]interface{}) string {
-	var msg bytes.Buffer
-
-	tmpl, err := template.New("").Parse(fmt)
-	if err != nil {
-		return fmt
-	}
-	err = tmpl.Execute(&msg, args)
-	if err != nil {
-		return fmt
-	}
-
-	return msg.String()
 }

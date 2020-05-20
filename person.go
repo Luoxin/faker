@@ -99,7 +99,7 @@ func (f *Faker) PersonNameFemale() (name string) {
 
 	nameFormatTemplate := p.Person.NameFormatTemplate
 	if nameFormatTemplate == "" {
-		nameFormatTemplate = "{{FirstName}}{{LastName}}"
+		nameFormatTemplate = "{{.FirstName}}{{.LastName}}"
 	}
 
 	return f.Format(nameFormatTemplate, map[string]interface{}{
