@@ -230,6 +230,12 @@ func New() *Faker {
 	return f
 }
 
+func NewWithLanguage(language I18nLanguage) *Faker {
+	f := New()
+	f.SetLanguage(language)
+	return f
+}
+
 // 格式化数据
 func (f *Faker) Format(fmt string, args map[string]interface{}) (out string) {
 	var msg bytes.Buffer
