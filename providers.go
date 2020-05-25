@@ -1334,7 +1334,7 @@ func (f *Faker) InitProviderMap() {
 				FreeEmailDomains: []string{
 					"qq.com", "126.com", "163.com", "ymail.com", "aliyun.com", "126.net",
 					"163.net", "vip.163.com", "sohu.com", "vip.sina.com.cn", "outlook.com",
-					"qq.com  ", "vip.qq.com", "foxmail.com", "vip.sina.com", "sina.com.cn",
+					"vip.qq.com", "foxmail.com", "vip.sina.com", "sina.com.cn",
 				},
 				UserNameFormatTemplates: []string{
 					"{{.LastName}}{{.FirstName}}", "{{.FirstName}}{{.LastName}}",
