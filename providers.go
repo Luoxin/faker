@@ -23,6 +23,7 @@ type AddressProvider struct {
 type InternetProvider struct {
 	FreeEmailDomains, Tlds, UserNameFormatTemplates []string
 	EmailFormatTemplate                             string
+	ImagePlaceholderServiceTemplateList             []string
 }
 
 type PhoneNumberProvider struct {
@@ -72,6 +73,12 @@ func (f *Faker) InitProviderMap() {
 					"{{.FirstName}}##", "?{{.LastName}}",
 				},
 				EmailFormatTemplate: "{{.UserName}}@{{.EmailDomain}}",
+				ImagePlaceholderServiceTemplateList: []string{
+					//"https://www.lorempixel.com/{{.WIDTH}}/{{.HEIGHT}}",
+					//"https://dummyimage.com/{{.WIDTH}}/{{.HEIGHT}}",
+					"https://placekitten.com/{{.WIDTH}}/{{.HEIGHT}}",
+					"https://placeimg.com/{{.WIDTH}}/{{.HEIGHT}}/any",
+				},
 			},
 			Person: &PersonProvider{
 				NameFormatTemplate: "{{.FirstName}}{{.LastName}}",

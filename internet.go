@@ -29,3 +29,31 @@ func (f *Faker) Email() (mail string) {
 		"EmailDomain": f.RandomStringElement(p.Internet.FreeEmailDomains),
 	})
 }
+
+func (f *Faker) Image(width, height uint32) string {
+	const (
+		maxWidth  = 1024
+		maxHeight = 1024
+	)
+
+	check := func(provider *Provider) bool {
+		return provider.Internet == nil || len(provider.Internet.ImagePlaceholderServiceTemplateList) == 0
+	}
+	p := f.GetProviderWithCheck(check)
+	if check(p) {
+		return ""
+	}
+
+	if width <= 0 || width > maxWidth {
+		width = uint32(f.IntBetween(1, maxWidth))
+	}
+
+	if height <= 0 || height > maxHeight {
+		height = uint32(f.IntBetween(1, maxHeight))
+	}
+
+	return f.Format(f.RandomStringElement(p.Internet.ImagePlaceholderServiceTemplateList), map[string]interface{}{
+		"WIDTH":  width,
+		"HEIGHT": height,
+	})
+}
