@@ -74,13 +74,9 @@ func (f *Faker) InitProviderMap() {
 				},
 				EmailFormatTemplate: "{{.UserName}}@{{.EmailDomain}}",
 				ImagePlaceholderServiceTemplateList: []string{
-					//"https://www.lorempixel.com/{{.WIDTH}}/{{.HEIGHT}}",
 					"https://dummyimage.com/{{.WIDTH}}/{{.HEIGHT}}",
 					"https://placekitten.com/{{.WIDTH}}/{{.HEIGHT}}",
 					"https://placeimg.com/{{.WIDTH}}/{{.HEIGHT}}/any",
-					"https://i.picsum.photos/id/#/{{.WIDTH}}/{{.HEIGHT}}.jpg",
-					"https://i.picsum.photos/id/##/{{.WIDTH}}/{{.HEIGHT}}.jpg",
-					"https://i.picsum.photos/id/###/{{.WIDTH}}/{{.HEIGHT}}.jpg",
 				},
 			},
 			Person: &PersonProvider{
