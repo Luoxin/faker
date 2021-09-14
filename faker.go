@@ -119,10 +119,7 @@ func (f *Faker) Float64() float64 {
 }
 
 func (f *Faker) Int() int {
-	maxU := ^uint(0) >> 1
-	max := int(maxU)
-	min := -max - 1
-	return f.IntBetween(min, max)
+	return f.Generator.Int()
 }
 
 func (f *Faker) Uint() uint {
@@ -165,6 +162,10 @@ func (f *Faker) Int32Between(min, max int32) int32 {
 	return int32(f.IntBetween(int(min), int(max)))
 }
 
+func (f *Faker) Unt32Between(min, max uint32) uint32 {
+	return uint32(f.IntBetween(int(min), int(max)))
+}
+
 func (f *Faker) Letter() string {
 	return f.RandomLetter()
 }
@@ -179,6 +180,28 @@ func (f *Faker) RandomLowLetter() string {
 
 func (f *Faker) RandomUpperLetter() string {
 	return string(f.Choice(asciiUppercase).(byte))
+}
+
+func (f *Faker) RandomLetterString(length int) string {
+	return f.RandomString(asciiLetters, length)
+}
+
+func (f *Faker) RandomLowLetterString(length int) string {
+	return f.RandomString(asciiLowercase, length)
+}
+
+func (f *Faker) RandomUpperLetterString(length int) string {
+	return f.RandomString(asciiUppercase, length)
+}
+
+func (f *Faker) RandomString(dataset []byte, length int) string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	bytes := make([]byte, length)
+	for i := range bytes {
+		bytes[i] = dataset[r.Intn(len(dataset))]
+	}
+
+	return string(bytes)
 }
 
 func (f *Faker) RandomBytesElement(s []byte) byte {
