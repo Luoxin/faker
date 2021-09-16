@@ -166,6 +166,10 @@ func (f *Faker) Unt32Between(min, max uint32) uint32 {
 	return uint32(f.IntBetween(int(min), int(max)))
 }
 
+func (f *Faker) Unt64Between(min, max uint64) uint64 {
+	return uint64(f.IntBetween(int(min), int(max)))
+}
+
 func (f *Faker) Letter() string {
 	return f.RandomLetter()
 }
